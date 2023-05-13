@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Esgoto Karaokê</title>
+
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/jquery-ui.min.css">
+        <link rel="stylesheet" href="/app/app.css">
+        <link rel="stylesheet" href="/app/theme/esgoto.css">
+    </head>
+    <body class="d-flex flex-column h-100">
+        <main class="flex-shrink-0 h-100">
+            <div class="container-fluid h-100">
+                <div class="row h-100">
+                    <div class="col col-md-2" id="playlist-column">
+                        <h2 class="main-title">Lista de espera</h2>
+                        <ul id="player-list"></ul>
+                        <div id="qr-code-container">
+                            <canvas id="qr-code"></canvas>
+                            <p class="text-center">http://<%= serverIp %>:3000/</span>
+                        </div>
+                    </div>
+                    <div class="col col-md-10" id="video-column">
+                        <div id="video-player"></div>
+                        <div id="video-transaction" class="w-100 h-100 d-none">
+                            <div class="row h-100 w-100 align-items-center justify-content-center my-auto" id="transaction-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <audio src="/assets/applause.mp3" class="d-none" id="audio-applause"></audio>
+        <script>
+        if (typeof module === 'object') {window.module = module; module = undefined; }
+        </script>
+        <script src="/assets/jquery-3.6.4.min.js"></script>
+        <script src="/assets/jquery-ui.min.js"></script>
+        <script>if (window.module) module = window.module;</script>
+
+        <script src="app/app.js"></script>
+        <script src="app/templates.js"></script>
+        <script src="/socketio/socket.io.min.js"></script>
+        <script>
+            var app = new App(window, '<%= serverIp %>');
+        </script>
+    </body>
+</html>

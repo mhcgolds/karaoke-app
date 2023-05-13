@@ -1,0 +1,43 @@
+{
+    "devMode": 
+    {
+        "active": true,
+        "initialVideos": ["BHZe6LfWDMw"]
+    },
+    "app":
+    {
+        "transaction":
+        {
+            "waitTime": 15,
+            "fadeTime": 800,
+            "playApplauseAudio": true
+        },
+        "playlist":
+        {
+            "playlistItemFadeTime": 800,
+            "waitVideoPlaylistId": "PLmRS4T21Ktb6wDBaxf8smTTIjudLgVxVu",
+            "hidePlaylist": false,
+            "hidePlaylistVideoName": false,
+            "hiddenVideoNameText": "<em>Video surpresa</em> 😮"
+        },
+        "qrcode":
+        {
+            "show": true
+        },
+        "mobile":
+        {
+            "appTitle": "Esgotokê",
+            "nextQueueMessage": "<p>🎤 <strong>Você é o próximo!</strong> 🎤</p><p>Se prepare e aguarde o final da música perto do palco.</p><p>🎵 <strong>Divirta-se!</strong> 🎵</p>",
+            "emptyQueueMessage": "<p>A fila está vazia!</p><p><strong>Aproveite para colocar a sua música 😉</strong></p>"
+        },
+        "admin":
+        {
+            "password": "123"
+        }
+    },
+    "search":
+    {
+        "youtubeApiKey": "AIzaSyA5QYjhtDitDIYMSew7Uquja2bPdYU8MLg",
+        "searchPattern": "<busca> karaoke"
+    }
+}

@@ -1,0 +1,27 @@
+body {
+    overflow-y: hidden
+}
+
+#player-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+#player-list .card {
+    border: 0;
+    margin-bottom: 10px;
+}
+
+#video-transaction {
+    position: relative;
+}
+
+.search-list > div:nth-child(n+3) {
+    margin-top: 10px;
+}
+
+#qr-code-container {
+    position: fixed;
+    bottom: 0;
+    margin-left: 4px;
+}

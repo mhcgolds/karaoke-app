@@ -1,0 +1,91 @@
+/* Colors (from darker to lighter)
+251721
+6A001A
+A40802
+F9C6BA
+EDEDE1
+*/
+
+body {
+    background-color: #251721;
+}
+
+/* Main page playlist title */
+.main-title {
+    color: #A40802
+}
+
+/* Main page playlist item person's name */
+.main-playlist-item-name {
+    color: #A40802
+}
+
+/* Main page playlist item video's name */
+.main-playlist-item-title {
+    color: #6A001A
+}
+
+/* Transaction person's name */
+.transaction-text-name {
+    color: #A40802;
+    font-size: 7em;
+}
+
+/* Transaction video's name */
+.transaction-text-title {
+    color: #6A001A;
+    font-size: 5.5em;
+}
+
+/* Transaction timer text */
+.transaction-text-time {
+    color: #EDEDE1;
+    font-size: 4em;
+}
+
+/* Transaction overlay */
+#video-transaction {
+    background-color: #000000;
+    /*background: url(/app/theme/bg.jpg) #000000 top right no-repeat;*/
+}
+
+/* Queue list item */
+#player-list div.card-body {
+    background-color: #EDEDE1;
+    border-radius: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* Mobile styles */
+
+/* Search list item title */
+.search-list .search-item-title {
+    color: #6A001A;
+}
+
+/* Queue list */
+#queue-list {
+    color: #EDEDE1
+}
+
+/* Queue list item person's name */
+#queue-list .search-item-name {
+    color: #A40802;
+}
+
+/* Queue list item videos's name */
+#queue-list .search-item-title {
+    color: #6A001A;
+}
+
+/* Mobile address under QR Code image */
+#qr-code-container p {
+    background-color: #EDEDE1;
+    color: #A40802
+}
+
+/* Mobile navigation menu */ 
+.mobile-nav {
+    text-align: right;
+}

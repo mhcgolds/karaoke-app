@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%= appTitle %> - Admin</title>
+
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/app/app.css">
+        <link rel="stylesheet" href="/app/theme/esgoto.css">
+    </head>
+    <body class="d-flex flex-column h-100">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 mobile-nav">
+            <div class="container-fluid h-100">
+                <a class="navbar-brand" href="#"><%= appTitle %> - Admin</a>
+            </div>
+        </nav>
+
+        <main class="flex-shrink-0 h-100">
+            <div class="container-fluid h-100">
+                <div class="row h-100">
+                    <form>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" id="admin_password" required="required" maxlength="20" placeholder="Senha">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="save-name">
+                            Enviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <script>
+            const form = document.querySelector('form');
+            const adminPassword = document.querySelector('#admin_password');
+            const button = document.querySelector('#save-name');
+
+            form.addEventListener('submit', (e) =>
+            {
+                e.preventDefault();
+
+                const password = adminPassword.value;
+
+                if (password)
+                {
+                    name.disabled = true;
+                    button.disabled = true;
+
+                    fetch(`/auth?password=${password}`)
+                        .then(res => res.text())
+                        .then(res => 
+                        {
+                            if (res === "true")
+                            {
+                                window.location.href = '/admin';
+                            }
+                            else 
+                            {
+                                name.disabled = false;
+                                button.disabled = false;
+                                window.alert(res);
+                            }
+                        })
+                        .catch(() => 
+                        {
+                            name.disabled = false;
+                            button.disabled = false;
+                            window.alert('Erro ao logar');
+                        });
+                }
+                else 
+                {
+                    window.alert('Informe a senha.');
+                }
+            });
+        </script>
+    </body>
+</html>
