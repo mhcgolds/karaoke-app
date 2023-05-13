@@ -33,7 +33,7 @@ class Server
 
         const httpServer = this.express.listen(port, () => 
         {
-            if (onListen) onListen();
+            if (onListen) onListen.call(this);
         });
         
         const { Server } = require("socket.io");

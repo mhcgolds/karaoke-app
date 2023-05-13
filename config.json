@@ -1,7 +1,7 @@
 {
     "devMode": 
     {
-        "active": true,
+        "active": false,
         "initialVideos": ["BHZe6LfWDMw"]
     },
     "app":
@@ -33,6 +33,10 @@
         "admin":
         {
             "password": "123"
+        },
+        "queue":
+        {
+            "showLoadConfirmationAtStartup": true
         }
     },
     "search":

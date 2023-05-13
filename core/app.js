@@ -5,9 +5,19 @@ class App
         this.users = [];
         this.admins = [];
 
+        this.jsonFilename = './data.json';
+
         const Youtube = require('./youtube.js');
         this.youtube = new Youtube();
 
+        this.fs = require('fs');
+
+        this.JsonFileCheck();
+        this.CheckForDevMode();
+    }
+
+    CheckForDevMode()
+    {
         // Tests
         if (config.Get('devMode.active'))
         {
@@ -61,6 +71,7 @@ class App
             user.videoTitle = videoTitle;
             user.order = isNaN(order) ? 1 : (order + 1);
             this.RefreshClientQueue();
+
             return true;
         }
 
@@ -82,8 +93,10 @@ class App
 
             socket.on('remove-queue-item', this.RemoveQueueItem.bind(this));
             socket.on('refresh-list', this.RefreshClientQueue.bind(this));
+            socket.on('queue-load-confirm', this.JsonFillDataConfirm.bind(this));
 
             this.RefreshClientQueue();
+            this.EmitQueueLoadConfirm();
 
             // Admin listeners
             socket.on('skip-video', this.AdminSkipVideo.bind(this, userIp));
@@ -97,6 +110,8 @@ class App
         user.videoId = null;
         user.videoTitle = null;
         user.order = null;
+
+        this.JsonWriteData();
     }
 
     SocketEmit(event, data)
@@ -105,11 +120,16 @@ class App
         {
             this.io.emit(event, data);
         }
+        else 
+        {
+            console.log('Socket not set', event, data);
+        }
     }
 
     RefreshClientQueue(skip)
     {
         this.SocketEmit('refresh-list', { users: this.GetQueue(), skip: !!skip });
+        this.JsonWriteData();
     }
 
     Search(searchQuery)
@@ -173,9 +193,77 @@ class App
             {
                 user.order = null;
                 user.videoId = null;
-                user.videoTitle = null
+                user.videoTitle = null;
+
                 this.RefreshClientQueue();
             }
+        }
+    }
+
+    // Checks for a json file for queue. 
+    // If found loads it, otherwise, creates it
+    JsonFileCheck()
+    {
+        this.fs.readFile(this.jsonFilename, { flag: 'a+' }, function(err, data)
+        {
+            this.JsonFillData(data);
+        }.bind(this));
+    }
+
+    JsonFillData(data)
+    {
+        if (data)
+        {
+            try 
+            {
+                data = JSON.parse(data);
+            }
+            catch (e)
+            {
+                return;
+            }
+
+            if ((!data || !data.length) && !config.Get('app.queue.showLoadConfirmationAtStartup', false))
+            {
+                this.users = data;
+            }
+            else 
+            {
+                this.tempJsonData = data;
+            }
+        }
+    }
+
+    JsonFillDataConfirm()
+    {
+        this.users = this.tempJsonData;
+        this.RefreshClientQueue();
+    }
+
+    JsonWriteData()
+    {
+        try 
+        {
+            const content = this.users.filter(item => item.videoId);
+            this.fs.writeFile(this.jsonFilename, JSON.stringify(content), (data) => {});
+        }
+        catch (e)
+        {
+            console.log('App.js: Error writing to json file', e);
+        }
+    }
+
+    AfterLoad()
+    {
+        this.EmitQueueLoadConfirm();
+    }
+
+    EmitQueueLoadConfirm()
+    {
+        // Send socket signal to window if this.tempJsonData is filled
+        if (this.io && this.tempJsonData)
+        {
+            this.SocketEmit('queue-load-confirm');
         }
     }
 }

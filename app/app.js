@@ -10,11 +10,15 @@ class App
         this.videoTransaction = document.querySelector('#video-transaction');
         this.transactionText = document.querySelector('#transaction-text');
         this.audioApplause = document.querySelector('#audio-applause');
+        this.messageContainer = document.querySelector('#message-container');
+        this.messageContainerNo = document.querySelector('#message-container span.message-container-no');
+        this.messageContainerYes = document.querySelector('#message-container span.message-container-yes');
+        this.messageContainerText = document.querySelector('#message-container div.message-container-text');
 
         // Params
         this.transactionTime = config.Get('app.transaction.waitTime');
         this.transactionFadeTime = config.Get('app.transaction.fadeTime');
-        this.playlistItemFadeTime = config.Get('app.playlist.playlistItemFadeTime');;
+        this.playlistItemFadeTime = config.Get('app.playlist.playlistItemFadeTime');
 
         this.queue = [];
         this.playStatus = -1;
@@ -125,6 +129,11 @@ class App
             this.RefreshQueue(this.queue);
         });
 
+        this.io.on('queue-load-confirm', () => 
+        {
+            this.ShowQueueLoadConfirm();
+        });
+
         this.RequestQueue();
 
         // Admin broadcasts
@@ -162,7 +171,6 @@ class App
     {
         if (this.waitingVideoOn)
         {
-            console.log('state', event, this, (event.data === 0 && !this.queue.length));
             if (event.data === 0 && !this.queue.length)
             {
                 //this.PlayWaitingPlaylistVideo();
@@ -303,7 +311,6 @@ class App
 
                 const youtube = new Youtube();
                 this.waitingPlaylistData = await youtube.GetPlaylistVideos(playlistId);
-                console.log('playlist loaded');
                 this.PlayNextVideo();
             }.bind(this))();
         }
@@ -325,7 +332,6 @@ class App
             // Get first not-played video
             const video = this.waitingPlaylistData.data.find(video => !video.played);
 
-            console.log(this.waitingPlaylistData, video);
             if (video)
             {
                 this.waitingVideoOn = true;
@@ -352,5 +358,45 @@ class App
             this.playStatus = 0;
             this.PlayNextVideo();
         }
+    }
+
+    ShowQueueLoadConfirm()
+    {
+        this.ShowMessage(
+            'Há uma fila salva, deseja carrega-la ?', 
+            1,
+            () =>
+            {
+                this.io.emit('queue-load-confirm', null);
+                this.RequestQueue();
+                this.HideMessage();
+            },
+            () =>
+            {
+                this.HideMessage();
+            });
+    }
+
+    // Types: 1- Yes or No
+    ShowMessage(text, type, optionYes, optionNo)
+    {
+        if (type === 1)
+        {
+            $(this.messageContainerYes)
+                .show()
+                .on('click', optionYes.bind(this));
+
+            $(this.messageContainerNo)
+                .show()
+                .on('click', optionNo.bind(this));
+        }
+
+        $(this.messageContainerText).text(text);
+        $(this.messageContainer).show();
+    }
+
+    HideMessage()
+    {
+        $(this.messageContainer).hide();
     }
 }

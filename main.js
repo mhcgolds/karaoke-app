@@ -12,7 +12,7 @@ global.config = new ConfigManager();
 
     const devMode = config.Get('devMode.active');
 
-    const createWindow = () => {
+    const createWindow = function() {
         const win = new BrowserWindow({
             width: 800,
             height: 600,
@@ -30,7 +30,10 @@ global.config = new ConfigManager();
             win.maximize();
         }
 
-        win.loadURL('http://localhost:3000/main');
+        win.loadURL('http://localhost:3000/main').then(() => 
+        {
+            this.App.AfterLoad();
+        });
     }
 
     const startExpress = () => 

@@ -25,3 +25,35 @@ body {
     bottom: 0;
     margin-left: 4px;
 }
+
+#message-container {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 5px;
+    text-align: center;
+    display: none;
+    padding: 5px;
+}
+
+.message-container-yes {
+    color: green;
+    cursor: pointer;
+    display: none;
+}
+
+.message-container-yes:hover {
+    font-weight: bold;
+}
+
+.message-container-no {
+    color: crimson;
+    cursor: pointer;
+    display: none;
+}
+
+.message-container-no:hover {
+    font-weight: bold;
+}

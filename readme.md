@@ -17,6 +17,8 @@
         - `hiddenVideoNameText`: (string) When video name is hidden by `hidePlaylistVideoName`, this text replaces the video title. Can be empty as well.
     - `qrcode`:
         - `show`: (bool) Should show or not the qrcode image
+    - `queue`:
+        - `showLoadConfirmationAtStartup`: (bool) If a queue is detected on startup, __true__ asks if it should be loaded, __false__ loads it automatically.
 - `search`:
     - `youtubeApiKey`: (string) The api key 
     - `searchPattern`: (string) An string to be used for seaching the video. Use `<busca>` to be replaced by user's search term. Ex. `"<busca> karaoke"`.
