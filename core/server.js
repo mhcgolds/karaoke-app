@@ -19,7 +19,7 @@ class Server
     {
         const express = require('express');
         this.express = express();
-        const port = 3000;
+        const port = config.Get('app.server.port', 3000);
         const path = require('path');
 
         this.express.set('views', path.join(__dirname, '..', '/views'));

@@ -16,7 +16,7 @@ class User
         this.nextMessage = this.wnd.document.querySelector('#next-message');
 
         // Admin stuff
-        this.queueModal = new bootstrap.Modal(this.wnd.document.querySelector('#queue-modal'));
+        //this.queueModal = new bootstrap.Modal(this.wnd.document.querySelector('#queue-modal'));
         this.modalUserId = null;
 
         if (this.nextMessage)

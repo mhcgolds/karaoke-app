@@ -19,6 +19,8 @@
         - `show`: (bool) Should show or not the qrcode image
     - `queue`:
         - `showLoadConfirmationAtStartup`: (bool) If a queue is detected on startup, __true__ asks if it should be loaded, __false__ loads it automatically.
+    - `server`:
+        - `port`: The server port that the app should run. Default is 3000.
 - `search`:
     - `youtubeApiKey`: (string) The api key 
     - `searchPattern`: (string) An string to be used for seaching the video. Use `<busca>` to be replaced by user's search term. Ex. `"<busca> karaoke"`.

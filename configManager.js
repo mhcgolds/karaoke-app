@@ -15,6 +15,7 @@ class ConfigManager
         }
         catch (e)
         {
+            logManager.Log('CFM001', logManager.types.ERROR, e);
             console.error('Error loading configuration', e);
             return;
         }

@@ -37,11 +37,20 @@
         "queue":
         {
             "showLoadConfirmationAtStartup": true
+        },
+        "server":
+        {
+            "port": 3000
         }
     },
     "search":
     {
-        "youtubeApiKey": "AIzaSyA5QYjhtDitDIYMSew7Uquja2bPdYU8MLg",
+        "youtubeApiKeys": 
+        [
+            "AIzaSyA5QYjhtDitDIYMSew7Uquja2bPdYU8MLg",
+            "AIzaSyA77gxXtHfYAG6kjlBlr41gh2GegxNXsUc",
+            "AIzaSyA5-2Hu7dz7_Go7AvQxlERZwF06SfChE6I"
+        ],
         "searchPattern": "<busca> karaoke"
     }
 }

@@ -5,11 +5,33 @@ class Youtube
         this.searchPattern = config.Get('search.searchPattern');
 
         const { google } = require("googleapis");
+        this.google = google;
+        this.fs = require('fs');
 
-        this.youtube = google.youtube(
+        this.jsonFilename = './youtube.json';
+        this.jsonObject = 
+        {
+            count: 0,
+            datetime: Date.now(),
+            keyIndex: 0
+        };
+
+        this.youtubeKeys = config.Get('search.youtubeApiKeys');
+
+        this.JsonFileCheck();
+    }
+
+    LocalLog(exception)
+    {
+        this.fs.writeFile('./error.txt', JSON.stringify(exception), (data) => {});
+    }
+
+    SetupYoutubeApi()
+    {
+        this.youtube = this.google.youtube(
         {
             version: "v3",
-            auth: config.Get('search.youtubeApiKey'),
+            auth: this.youtubeKeys[this.jsonObject.keyIndex]
         });
     }
 
@@ -27,6 +49,8 @@ class Youtube
                 videoEmbeddable: true,
                 maxResults: 15
             });
+
+            this.JsonFileWrite(true);
 
             let list = [];
             response.data.items.forEach(item =>
@@ -46,6 +70,7 @@ class Youtube
         }
         catch (e)
         {
+            this.LocalLog(e);
             return {
                 success: false,
                 data: e
@@ -82,11 +107,65 @@ class Youtube
         }
         catch (e)
         {
+            this.LocalLog(e);
             return {
                 success: false,
                 data: e
             };
         }
+    }
+
+    JsonFileCheck()
+    {
+        this.fs.readFile(this.jsonFilename, { flag: 'a+' }, function(err, data)
+        {
+            // No file or empty data, creates a new file
+            if (!data || !data.length) 
+            {
+                this.JsonFileWrite();
+            }
+            else 
+            {
+                const content = JSON.parse(data);
+
+                // If last registered datetime is lower than 24 hours ago, the file is old and need to be updated
+                if (content.datetime < (Date.now() - (60 * 60 * 24)))
+                {
+                    this.JsonFileWrite();
+                }
+                else
+                {
+                    // If file isn't old, it could be a app crash, power off or anything that restarted the app, so youtube data needs to be reloaded
+                    this.jsonObject = content;
+                }
+            }
+        }.bind(this));
+    }
+
+    JsonFileWrite(increaseCounter)
+    {
+        if (increaseCounter)
+        {
+            // If search counter reaches 99 or more, resets it and increase keyIndex to change key for next 100 searches
+            if (this.jsonObject.count >= 99)
+            {
+                this.jsonObject.count = 0;
+                this.jsonObject.keyIndex++;
+                this.SetupYoutubeApi();
+            }
+            else 
+            {
+                this.jsonObject.count++;
+            }
+
+            this.jsonObject.datetime = Date.now();
+        }
+        else 
+        {
+            this.SetupYoutubeApi();
+        }
+
+        this.fs.writeFile(this.jsonFilename, JSON.stringify(this.jsonObject), (data) => {});
     }
 }
 
