@@ -60,7 +60,7 @@
         <script src="app/templates.js"></script>
         <script src="/socketio/socket.io.min.js"></script>
         <script>
-            new User(window, '<%= serverInstanceId %>', <%- mobileSettings %>, <%= admin %>);
+            new User(window, '<%= serverInstanceId %>', <%- mobileSettings %>, '<%= logTimestamp %>', <%= admin %>);
         </script>
     </body>
 </html>

@@ -17,28 +17,35 @@ class Server
 
     SetupExpress(onListen)
     {
-        const express = require('express');
-        this.express = express();
         const port = config.Get('app.server.port', 3000);
         const path = require('path');
+        const express = require('express');
 
+        this.express = express();
         this.express.set('views', path.join(__dirname, '..', '/views'));
         this.express.set('view engine', 'ejs');
         this.express.engine('html', require('ejs').renderFile);
-
         this.express.use('/static', express.static(path.join(__dirname, '..', 'node_modules/bootstrap/dist')));
         this.express.use('/socketio', express.static(path.join(__dirname, '..', 'node_modules/socket.io/client-dist')));
         this.express.use('/app', express.static(path.join(__dirname, '..', 'app')));
         this.express.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 
-        const httpServer = this.express.listen(port, () => 
+        try 
         {
-            if (onListen) onListen.call(this);
-        });
+            const httpServer = this.express.listen(port, () => 
+            {
+                logManager.Log('SRV101', logManager.types.INFO, `Server started at port "${port}"`);
+                if (onListen) onListen.call(this);
+            });
         
-        const { Server } = require("socket.io");
-        this.io = new Server(httpServer);
-        this.App.SetSocket(this.io);
+            const { Server } = require("socket.io");
+            this.io = new Server(httpServer);
+            this.App.SetSocket(this.io);
+        }
+        catch (e)
+        {
+            logManager.Log('SRV901', logManager.types.ERROR, e);
+        }
     }
 
     GetUserIp(req)
@@ -65,7 +72,7 @@ class Server
         this.express.get('/main', (req, res) => 
         {
             const ip = require('ip');
-            res.render('index.html', { serverIp: ip.address() });
+            res.render('index.html', { serverIp: ip.address(), logTimestamp: logManager.GetCurrentTimestamp() });
         });
 
         // Mobile routes
@@ -81,7 +88,7 @@ class Server
 
         this.express.get('/', (req, res) => 
         {
-            res.render('user.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle });
+            res.render('user.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle, logTimestamp: logManager.GetCurrentTimestamp() });
         });
 
         this.express.get('/signin', (req, res) => 
@@ -135,7 +142,7 @@ class Server
         {
             if (this.IsUserAdmin(req))
             {
-                res.render('admin.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle, admin: true });
+                res.render('admin.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle, logTimestamp: logManager.GetCurrentTimestamp(), admin: true });
             }
             else 
             {

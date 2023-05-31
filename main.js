@@ -10,6 +10,8 @@ var serverInstance;
 global.config = new ConfigManager();
 global.logManager = new LogManager();
 
+logManager.Log('STARTUP', logManager.types.INFO, 'Starting up application');
+
 (async () => 
 {
     await config.Load();
@@ -35,7 +37,10 @@ global.logManager = new LogManager();
         if (devMode)
         {
             win.maximize();
+            win.webContents.openDevTools();
         }
+
+        win.webContents.openDevTools();
 
         Menu.setApplicationMenu(Menu.buildFromTemplate(
         [{

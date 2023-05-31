@@ -1,6 +1,6 @@
 class App 
 {
-    constructor(wnd, serverIp)
+    constructor(wnd, serverIp, logTimestamp)
     {
         this.wnd = wnd;
         this.templates = new Templates();
@@ -24,6 +24,8 @@ class App
         this.playStatus = -1;
         this.serverIp = serverIp;
 
+        this.logManager = new logManager(logTimestamp);
+
         this.Init();
     }
 
@@ -37,6 +39,8 @@ class App
         });
 
         this.GenerateQrCode();
+
+        this.logManager.Log('APP101', this.logManager.types.INFO, 'App started');
     }
 
     CreateVideoContainer(onReady)
@@ -91,6 +95,8 @@ class App
             this.waitingVideoOn = false;
             this.ShowVideoTransaction(this.queue[0], () => 
             {
+                logManager.Log('APP102', logManager.types.INFO, `PLaying video. Id=${this.queue[0].videoId}`);
+
                 this.RemoveFirstQueueVideo();
                 this.player.playVideo().then(() => 
                 {

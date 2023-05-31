@@ -22,6 +22,7 @@ class App
         if (config.Get('devMode.active'))
         {
             console.log('Dev mode ACTIVE');
+            logManager.Log('API101', logManager.types.INFO, 'Dev mode ON');
 
             const videoList = config.Get('devMode.initialVideos', null);
 
@@ -50,6 +51,8 @@ class App
                 order: null
             });
 
+            logManager.Log('API101', logManager.types.INFO, `User added "${name}"`);
+
             return userId;
         }
         else 
@@ -71,6 +74,8 @@ class App
             user.videoTitle = videoTitle;
             user.order = isNaN(order) ? 1 : (order + 1);
             this.RefreshClientQueue();
+
+            logManager.Log('API102', logManager.types.INFO, `Video queued. Id=${videoId} User=${userId}`);
 
             return true;
         }

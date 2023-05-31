@@ -1,6 +1,6 @@
 class User
 {
-    constructor(wnd, serverInstanceId, settings, isAdmin)
+    constructor(wnd, serverInstanceId, settings, logTimestamp, isAdmin)
     {
         this.wnd = wnd;
         this.templates = new Templates();
@@ -23,6 +23,8 @@ class User
         {
             this.nextMessage.innerHTML = this.settings.nextQueueMessage;
         }
+
+        this.logManager = new logManager(logTimestamp);
 
         this.Init();
     }
