@@ -17,6 +17,7 @@
         - `hiddenVideoNameText`: (string) When video name is hidden by `hidePlaylistVideoName`, this text replaces the video title. Can be empty as well.
     - `qrcode`:
         - `show`: (bool) Should show or not the qrcode image
+        - `saveToFile`: (bool) If true, a image with qrcode will be saved on app's path
     - `queue`:
         - `showLoadConfirmationAtStartup`: (bool) If a queue is detected on startup, __true__ asks if it should be loaded, __false__ loads it automatically.
     - `server`:

@@ -1,11 +1,12 @@
 class App 
 {
-    constructor(wnd, serverIp, logTimestamp)
+    constructor(wnd, serverIp, logTimestamp, appPath)
     {
         this.wnd = wnd;
         this.templates = new Templates();
 
         // DOM Elements
+        this.serverPort = document.querySelector('#server-port');
         this.playerList = document.querySelector('#player-list');
         this.videoTransaction = document.querySelector('#video-transaction');
         this.transactionText = document.querySelector('#transaction-text');
@@ -15,16 +16,25 @@ class App
         this.messageContainerYes = document.querySelector('#message-container span.message-container-yes');
         this.messageContainerText = document.querySelector('#message-container div.message-container-text');
 
+        // Load managers
+        this.appPath = decodeURIComponent(appPath);
+        const path = require('path');
+        const ConfigManager = require(path.join(this.appPath, 'configManager.js'));
+        const LogManager = require(path.join(this.appPath, 'logManager.js'));
+
+        this.configManager = new ConfigManager(this.appPath);
+        this.logManager = new LogManager(logTimestamp);
+
+        this.configManager.Load();
+
         // Params
-        this.transactionTime = config.Get('app.transaction.waitTime');
-        this.transactionFadeTime = config.Get('app.transaction.fadeTime');
-        this.playlistItemFadeTime = config.Get('app.playlist.playlistItemFadeTime');
+        this.transactionTime = this.configManager.Get('app.transaction.waitTime');
+        this.transactionFadeTime = this.configManager.Get('app.transaction.fadeTime');
+        this.playlistItemFadeTime = this.configManager.Get('app.playlist.playlistItemFadeTime');
 
         this.queue = [];
         this.playStatus = -1;
         this.serverIp = serverIp;
-
-        this.logManager = new logManager(logTimestamp);
 
         this.Init();
     }
@@ -79,10 +89,10 @@ class App
             className = 'd-none fadein-video';
         }
 
-        const hidePlaylistVideoName = config.Get('app.playlist.hidePlaylistVideoName');
+        const hidePlaylistVideoName = this.configManager.Get('app.playlist.hidePlaylistVideoName');
         if (hidePlaylistVideoName)
         {
-            video = config.Get('app.playlist.hiddenVideoNameText', '');
+            video = this.configManager.Get('app.playlist.hiddenVideoNameText', '');
         }
 
         this.playerList.appendChild(this.templates.RenderTemplate('player-list-item', {name, video, className}));
@@ -95,7 +105,7 @@ class App
             this.waitingVideoOn = false;
             this.ShowVideoTransaction(this.queue[0], () => 
             {
-                logManager.Log('APP102', logManager.types.INFO, `PLaying video. Id=${this.queue[0].videoId}`);
+                this.logManager.Log('APP102', this.logManager.types.INFO, `PLaying video. Id=${this.queue[0].videoId}`);
 
                 this.RemoveFirstQueueVideo();
                 this.player.playVideo().then(() => 
@@ -272,7 +282,7 @@ class App
 
     PlayApplause()
     {
-        if (config.Get('app.transaction.playApplauseAudio'))
+        if (this.configManager.Get('app.transaction.playApplauseAudio'))
         {
             this.audioApplause.play();
         }
@@ -289,22 +299,35 @@ class App
 
     GenerateQrCode()
     {
-        if (config.Get('app.qrcode.show'))
+        if (this.configManager.Get('app.qrcode.show'))
         {
             var QRCode = require('qrcode');
             var canvas = document.getElementById('qr-code');
+            const serverPort = this.configManager.Get('app.server.port', 3000);
 
-            QRCode.toCanvas(canvas, `http://${this.serverIp}:3000/`, { width: 300, margin: 1 })
+            this.serverPort.innerText = serverPort;
+
+            QRCode.toCanvas(canvas, `http://${this.serverIp}:${serverPort}/`, { width: 300, margin: 1 })
                 .then(error => 
                 {
                     if (error) console.error(error);
                 });
+
+            if (this.configManager.Get('app.qrcode.saveToFile', false))
+            {
+                const path = require('path');
+                QRCode.toFile(path.join(this.appPath, 'qrcode.png'), `http://${this.serverIp}:${serverPort}/`, { width: 1000, margin: 1 })
+                    .then(error => 
+                    {
+                        if (error) console.error(error);
+                    });
+            }
         }
     }
 
     FetchWaitingPlaylistVideos()
     {
-        const playlistId = config.Get('app.playlist.waitVideoPlaylistId', null);
+        const playlistId = this.configManager.Get('app.playlist.waitVideoPlaylistId', null);
 
         if (playlistId)
         {
@@ -324,7 +347,7 @@ class App
 
     HidePlaylist()
     {
-        if (config.Get('app.playlist.hidePlaylist', false))
+        if (this.configManager.Get('app.playlist.hidePlaylist', false))
         {
             $('#playlist-column').addClass('d-none');
             $('#video-column').removeClass('col-md-10').addClass('col-md-12');

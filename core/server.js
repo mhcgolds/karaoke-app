@@ -1,12 +1,21 @@
 class Server
 {
-    constructor()
+    constructor(settings)
     {
         const app = require('./app');
-        this.App = new app();
+        this.App = new app(settings);
         this.admins = [];
+        this.settings = settings;
 
         this.instanceId = Date.now();
+
+        const ConfigManager = require('../configManager.js');
+        const LogManager = require('../logManager.js');
+
+        this.configManager = new ConfigManager(this.settings.appPath);
+        this.logManager = new LogManager(this.settings.logTimestamp);
+
+        this.configManager.Load();
     }
 
     Start(onListen)
@@ -17,7 +26,7 @@ class Server
 
     SetupExpress(onListen)
     {
-        const port = config.Get('app.server.port', 3000);
+        const port = this.configManager.Get('app.server.port', 3000);
         const path = require('path');
         const express = require('express');
 
@@ -34,7 +43,7 @@ class Server
         {
             const httpServer = this.express.listen(port, () => 
             {
-                logManager.Log('SRV101', logManager.types.INFO, `Server started at port "${port}"`);
+                this.logManager.Log('SRV101', this.logManager.types.INFO, `Server started at port "${port}"`);
                 if (onListen) onListen.call(this);
             });
         
@@ -44,7 +53,7 @@ class Server
         }
         catch (e)
         {
-            logManager.Log('SRV901', logManager.types.ERROR, e);
+            this.logManager.Log('SRV901', this.logManager.types.ERROR, e);
         }
     }
 
@@ -64,6 +73,7 @@ class Server
         const userIp = this.GetUserIp(req);
         this.admins.push(userIp);
         this.App.AddAdmin(userIp);
+        this.logManager.Log('SRV102', this.logManager.types.INFO, `Admin logged in. Ip=${userIp}`);
     }
 
     CreateRoutes()
@@ -72,23 +82,28 @@ class Server
         this.express.get('/main', (req, res) => 
         {
             const ip = require('ip');
-            res.render('index.html', { serverIp: ip.address(), logTimestamp: logManager.GetCurrentTimestamp() });
+            res.render('index.html', 
+            { 
+                serverIp: ip.address(), 
+                logTimestamp: this.logManager.GetCurrentTimestamp(), 
+                appPath: encodeURIComponent(this.settings.appPath)
+            });
         });
 
         // Mobile routes
-        const appTitle = config.Get('app.mobile.appTitle', 'Karaokê');
+        const appTitle = this.configManager.Get('app.mobile.appTitle', 'Karaokê');
         const mobileSettings = JSON.stringify(
         {
-            hidePlaylistVideoName: config.Get('app.playlist.hidePlaylistVideoName', false),
-            hiddenVideoNameText: config.Get('app.playlist.hiddenVideoNameText', ''),
-            emptyQueueMessage: config.Get('app.mobile.emptyQueueMessage', null),
-            nextQueueMessage: config.Get('app.mobile.nextQueueMessage', null),
+            hidePlaylistVideoName: this.configManager.Get('app.playlist.hidePlaylistVideoName', false),
+            hiddenVideoNameText: this.configManager.Get('app.playlist.hiddenVideoNameText', ''),
+            emptyQueueMessage: this.configManager.Get('app.mobile.emptyQueueMessage', null),
+            nextQueueMessage: this.configManager.Get('app.mobile.nextQueueMessage', null),
             appTitle
         });
 
         this.express.get('/', (req, res) => 
         {
-            res.render('user.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle, logTimestamp: logManager.GetCurrentTimestamp() });
+            res.render('user.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle });
         });
 
         this.express.get('/signin', (req, res) => 
@@ -142,7 +157,7 @@ class Server
         {
             if (this.IsUserAdmin(req))
             {
-                res.render('admin.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle, logTimestamp: logManager.GetCurrentTimestamp(), admin: true });
+                res.render('admin.html', { serverInstanceId: this.instanceId, mobileSettings, appTitle, admin: true });
             }
             else 
             {
@@ -165,7 +180,7 @@ class Server
         this.express.get('/auth', (req, res) => 
         {
             const userPassword = req.query.password,
-                  adminPassword = config.Get('app.admin.password', null);
+                  adminPassword = this.configManager.Get('app.admin.password', null);
 
             if (!adminPassword)
             {

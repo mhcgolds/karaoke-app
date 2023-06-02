@@ -22,7 +22,8 @@
         },
         "qrcode":
         {
-            "show": true
+            "show": true,
+            "saveToFile": true
         },
         "mobile":
         {

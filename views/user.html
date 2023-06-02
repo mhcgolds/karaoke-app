@@ -49,7 +49,7 @@
         <script src="app/templates.js"></script>
         <script src="/socketio/socket.io.min.js"></script>
         <script>
-            new User(window, '<%= serverInstanceId %>', <%- mobileSettings %>, '<%= logTimestamp %>');
+            new User(window, '<%= serverInstanceId %>', <%- mobileSettings %>);
 
             document.querySelector('form').addEventListener('submit', (e) => e.preventDefault());
         </script>

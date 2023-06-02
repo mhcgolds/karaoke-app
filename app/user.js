@@ -1,6 +1,6 @@
 class User
 {
-    constructor(wnd, serverInstanceId, settings, logTimestamp, isAdmin)
+    constructor(wnd, serverInstanceId, settings, isAdmin)
     {
         this.wnd = wnd;
         this.templates = new Templates();
@@ -16,15 +16,16 @@ class User
         this.nextMessage = this.wnd.document.querySelector('#next-message');
 
         // Admin stuff
-        //this.queueModal = new bootstrap.Modal(this.wnd.document.querySelector('#queue-modal'));
-        this.modalUserId = null;
+        if (this.queueList && isAdmin)
+        {
+            this.queueModal = new bootstrap.Modal(this.wnd.document.querySelector('#queue-modal'));
+            this.modalUserId = null;
+        }
 
         if (this.nextMessage)
         {
             this.nextMessage.innerHTML = this.settings.nextQueueMessage;
         }
-
-        this.logManager = new logManager(logTimestamp);
 
         this.Init();
     }
@@ -166,7 +167,10 @@ class User
     RefreshQueue(queue)
     {
         // Clear list
-        this.queueList.innerText = '';
+        if (this.queueList)
+        {
+            this.queueList.innerText = '';
+        }
 
         if (queue && queue.length)
         {
@@ -184,18 +188,19 @@ class User
                     hideAdminModal = false;
                 }
 
-                this.queueList.appendChild(this.templates.RenderTemplate('queue-list-item', { name: listItem.name, video, id: listItem.id }));
+                if (this.queueList)
+                {
+                    this.queueList.appendChild(this.templates.RenderTemplate('queue-list-item', { name: listItem.name, video, id: listItem.id }));
+                }
             });
 
             if (this.nextMessage)
             {
-                if (queue[0].id === this.userId)
+                this.nextMessage.style.display = 'none';
+
+                if (this.nextMessage && queue[0].id === this.userId)
                 {
                     this.nextMessage.style.display = 'inline-block';
-                }
-                else 
-                {
-                    this.nextMessage.style.display = 'none';
                 }
             }
 
@@ -206,7 +211,10 @@ class User
         }
         else 
         {
-            this.queueList.innerHTML = this.settings.emptyQueueMessage || 'A fila está vazia! Aproveite para colocar uma música!';
+            if (this.queueList)
+            {
+                this.queueList.innerHTML = this.settings.emptyQueueMessage || 'A fila está vazia! Aproveite para colocar uma música!';
+            }
             
             if (this.IsAdmin())
             {
@@ -232,13 +240,16 @@ class User
             this.io.emit('skip-video');
         });
 
-        this.queueList.addEventListener('click', (e) => 
+        if (this.queueList)
         {
-            if (e.target.classList.value.indexOf('queue-card'))
+            this.queueList.addEventListener('click', (e) => 
             {
-                this.ShowQueueItemMenu(e.target.dataset.userid);
-            }
-        });
+                if (e.target.classList.value.indexOf('queue-card'))
+                {
+                    this.ShowQueueItemMenu(e.target.dataset.userid);
+                }
+            });
+        }
 
         this.wnd.document.querySelector('div.modal-body').addEventListener('click', (e) =>
         {

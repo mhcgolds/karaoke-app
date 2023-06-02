@@ -1,8 +1,17 @@
 class Youtube
 {
-    constructor()
+    constructor(settings)
     {
-        this.searchPattern = config.Get('search.searchPattern');
+        this.settings = settings;
+        const ConfigManager = require('../configManager.js');
+        const LogManager = require('../logManager.js');
+
+        this.configManager = new ConfigManager(this.settings.appPath);
+        this.logManager = new LogManager(this.settings.logTimestamp);
+
+        this.configManager.Load();
+
+        this.searchPattern = this.configManager.Get('search.searchPattern');
 
         const { google } = require("googleapis");
         this.google = google;
@@ -16,14 +25,9 @@ class Youtube
             keyIndex: 0
         };
 
-        this.youtubeKeys = config.Get('search.youtubeApiKeys');
+        this.youtubeKeys = this.configManager.Get('search.youtubeApiKeys');
 
         this.JsonFileCheck();
-    }
-
-    LocalLog(exception)
-    {
-        this.fs.writeFile('./error.txt', JSON.stringify(exception), (data) => {});
     }
 
     SetupYoutubeApi()
@@ -70,7 +74,8 @@ class Youtube
         }
         catch (e)
         {
-            this.LocalLog(e);
+            console.log(response);
+            this.logManager.Log('YT201', this.logManager.types.ERROR, e);
             return {
                 success: false,
                 data: e
@@ -107,7 +112,7 @@ class Youtube
         }
         catch (e)
         {
-            this.LocalLog(e);
+            this.logManager.Log('YT202', this.logManager.types.ERROR, e);
             return {
                 success: false,
                 data: e

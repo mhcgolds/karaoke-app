@@ -19,7 +19,7 @@
                         <ul id="player-list"></ul>
                         <div id="qr-code-container">
                             <canvas id="qr-code"></canvas>
-                            <p class="text-center">http://<%= serverIp %>:3000/</span>
+                            <p class="text-center">http://<%= serverIp %>:<span id="server-port"></span>/</span>
                         </div>
                     </div>
                     <div class="col col-md-10" id="video-column">
@@ -47,7 +47,7 @@
         <script src="app/templates.js"></script>
         <script src="/socketio/socket.io.min.js"></script>
         <script>
-            var app = new App(window, '<%= serverIp %>', '<%= logTimestamp %>');
+            var app = new App(window, '<%= serverIp %>', '<%= logTimestamp %>', '<%= appPath %>');
         </script>
     </body>
 </html>

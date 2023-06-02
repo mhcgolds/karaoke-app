@@ -1,16 +1,26 @@
 class App 
 {
-    constructor()
+    constructor(settings)
     {
         this.users = [];
         this.admins = [];
+        this.settings = settings;
 
-        this.jsonFilename = './data.json';
+        const ConfigManager = require('../configManager.js');
+        const LogManager = require('../logManager.js');
+
+        this.configManager = new ConfigManager(this.settings.appPath);
+        this.logManager = new LogManager(this.settings.logTimestamp);
+
+        this.configManager.Load();
 
         const Youtube = require('./youtube.js');
-        this.youtube = new Youtube();
+        this.youtube = new Youtube(settings);
 
         this.fs = require('fs');
+        const path = require('path');
+
+        this.jsonFilename = path.join(this.settings.appPath, 'data.json');
 
         this.JsonFileCheck();
         this.CheckForDevMode();
@@ -19,12 +29,12 @@ class App
     CheckForDevMode()
     {
         // Tests
-        if (config.Get('devMode.active'))
+        if (this.configManager.Get('devMode.active'))
         {
             console.log('Dev mode ACTIVE');
-            logManager.Log('API101', logManager.types.INFO, 'Dev mode ON');
+            this.logManager.Log('API101', this.logManager.types.INFO, 'Dev mode ON');
 
-            const videoList = config.Get('devMode.initialVideos', null);
+            const videoList = this.configManager.Get('devMode.initialVideos', null);
 
             if (videoList)
             {
@@ -51,7 +61,7 @@ class App
                 order: null
             });
 
-            logManager.Log('API101', logManager.types.INFO, `User added "${name}"`);
+            this.logManager.Log('API101', this.logManager.types.INFO, `User added '${name}'`);
 
             return userId;
         }
@@ -75,7 +85,7 @@ class App
             user.order = isNaN(order) ? 1 : (order + 1);
             this.RefreshClientQueue();
 
-            logManager.Log('API102', logManager.types.INFO, `Video queued. Id=${videoId} User=${userId}`);
+            this.logManager.Log('API102', this.logManager.types.INFO, `Video queued. Id=${videoId} User=${userId}`);
 
             return true;
         }
@@ -228,7 +238,7 @@ class App
                 return;
             }
 
-            if ((!data || !data.length) && !config.Get('app.queue.showLoadConfirmationAtStartup', false))
+            if ((!data || !data.length) && !this.configManager.Get('app.queue.showLoadConfirmationAtStartup', false))
             {
                 this.users = data;
             }
@@ -266,7 +276,7 @@ class App
     EmitQueueLoadConfirm()
     {
         // Send socket signal to window if this.tempJsonData is filled
-        if (this.io && this.tempJsonData)
+        if (this.io && this.tempJsonData.length)
         {
             this.SocketEmit('queue-load-confirm');
         }

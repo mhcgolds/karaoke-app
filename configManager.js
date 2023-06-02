@@ -1,22 +1,23 @@
 class ConfigManager
 {
-    constructor()
+    constructor(appPath)
     {
+        this.appPath = appPath;
     }
 
-    async Load()
+    Load()
     {
         const fs = require('fs');
         const path = require('path');
 
         try 
         {
-            this.content = await fs.promises.readFile(path.join(__dirname, 'config.json'));
+            this.content = fs.readFileSync(path.join(this.appPath, 'config.json'), { flag: 'r' });
         }
         catch (e)
         {
-            logManager.Log('CFM001', logManager.types.ERROR, e);
             console.error('Error loading configuration', e);
+            logManager.Log('CFM001', logManager.types.ERROR, e);
             return;
         }
         
